@@ -1,7 +1,17 @@
 var Asteroids = (function() {
-	function MovingObject(x, y){
+	function MovingObject(x, y, r){
 		this.positionX = x;
 		this.positionY = y;
+		this.radius = r;
+		this.speed = 2;
+		this.dx = (Math.random() < 0.5) ?
+		-this.speed * Math.random() : this.speed * Math.random();
+		this.dy = (Math.random() < 0.5) ?
+		-this.speed * Math.random() : this.speed * Math.random();
+		this.update = function(){
+			this.positionX += this.dx;
+			this.positionY += this.dy;
+		}
 
 		this.offscreen = function(){
 			if ((this.positionX < 0 || this.positionX > 800) ||
@@ -12,24 +22,22 @@ var Asteroids = (function() {
 		}
 	}
 
-	function Asteroid(x, y){
-		this.positionX = x; // Do we have to do this twice?
-		this.positionY = y;
-		this.dx = (Math.random() < 0.5) ? -2 * Math.random() : 2 * Math.random();
-		this.dy = (Math.random() < 0.5) ? -2 * Math.random() : 2 * Math.random();
-		this.update = function(){
-			this.positionX += this.dx;
-			this.positionY += this.dy;
-		}
+	function Asteroid(x, y, r){
+		MovingObject.call(this, x, y, r);
 	}
 
+	function E(){
+		this.constructor = new Asteroid();
+	}
 
-	Asteroid.prototype = new MovingObject();
+	E.prototype = MovingObject.prototype;
+	Asteroid.prototype = new E();
 
-	Asteroid.randomAsteroid = function(maxX, maxY){
+	Asteroid.randomAsteroid = function(maxX, maxY, r){
 		return new Asteroid(
 			maxX * Math.random(),
-			maxY * Math.random());
+			maxY * Math.random(),
+			r);
 	};
 
 
@@ -40,9 +48,9 @@ var Asteroids = (function() {
 		ctx.beginPath();
 
 		ctx.arc(
-			this.positionX,
-			this.positionY,
-			10,
+			this.positionX % 800,
+			this.positionY % 800,
+			this.radius,
 			0,
 			2 * Math.PI,
 			false
@@ -58,12 +66,14 @@ var Asteroids = (function() {
 		this.asteroids = []
 
 		for (var i = 0; i < numAsteroids; i++) {
-			this.asteroids.push(Asteroid.randomAsteroid(this.xDim, this.yDim));
+			this.asteroids.push(Asteroid.randomAsteroid(this.xDim, this.yDim, 20));
 		}
 	}
 
 	Game.prototype.render = function(ctx){
 		ctx.clearRect(0, 0, this.xDim, this.yDim);
+
+		this.ship.draw(ctx);
 
 		for (var i = 0; i < this.asteroids.length; i++){
 			console.log(this.asteroids[i]);
@@ -82,30 +92,65 @@ var Asteroids = (function() {
 	};
 
 	Game.prototype.update = function(){
+
+		// this.ship.update();
+
 		for (var i = 0; i < this.asteroids.length; i++){
  	  	this.asteroids[i].update();
+		}
 
-			if (this.asteroids[i].offscreen()) {
-				this.asteroids[i] = Asteroid.randomAsteroid(this.xDim, this.yDim);
-			}
+		if (this.ship.isHit(this.asteroids)) {
+			console.log("Game Over!");
+			alert("Game Over!");
 		}
 	}
 
 	function Ship(x, y){
-		this.positionX = x;
-		this.positionY = y;
+		MovingObject.call(this, x, y);
+		this.velocity = { x: 0, y: 0 };
 	}
+	//
 
-	Ship.prototype.draw = function(ctx){
 
-	}
-
+	// inheritance
 	function F(){
 		this.constructor = new Ship();
 	}
 
 	F.prototype = MovingObject.prototype;
 	Ship.prototype = new F();
+
+	Ship.prototype.draw = function(ctx){
+		console.log(ctx);
+
+		ctx.fillStyle = "blue";
+		ctx.beginPath();
+
+		ctx.arc(
+			this.positionX,
+			this.positionY,
+			10,
+			0,
+			2 * Math.PI,
+			false
+		);
+
+		ctx.fill();
+	}
+
+	Ship.prototype.isHit = function(asteroids){
+		for(var i=0; i < asteroids.length; i++){
+			var xDifference = (asteroids[i].positionX - this.positionX);
+	    var yDifference = (asteroids[i].positionY - this.positionY);
+			var distance = Math.sqrt(xDifference*xDifference +
+														   yDifference*yDifference);
+
+			if (distance < (this.radius + asteroids[i].radius)){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	return {
 		Asteroid: Asteroid,
