@@ -307,7 +307,7 @@ var Asteroids = (function() {
 
 				if (distance < (currBullet.radius + asteroids[i].radius)){
 					asteroids[i] = Asteroid.randomAsteroid(1, 1, 20);
-					this.bullets.splice(j, j);
+					this.bullets.splice(j, j)
 				}
 			}
 		}
