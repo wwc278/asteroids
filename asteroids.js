@@ -116,7 +116,7 @@ var Asteroids = (function() {
 			that.ship.power(-0.5);
 		})
 		key('down', function(){
-			that.ship.power(0.5);
+			that.ship.power(0.001);
 		})
 
 		key('left', function(){
