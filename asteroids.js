@@ -103,20 +103,20 @@ var Asteroids = (function() {
 		var that = this;
 
 		that.updateAndRender = window.setInterval(function(){
-			that.update();
+			that.update(ctx);
 			that.render(ctx);
 		}, 1000/60);
 
 	};
 
-	Game.prototype.update = function(){
+	Game.prototype.update = function(ctx){
 
 		var that = this;
 		key('up', function(){
-			that.ship.power(-0.5);
+			that.ship.power(-0.1);
 		})
 		key('down', function(){
-			that.ship.power(0.001);
+			that.ship.power(0.1);
 		})
 
 		key('left', function(){
@@ -132,9 +132,11 @@ var Asteroids = (function() {
 		})
 
 		this.ship.update();
+
 		for (var i = 0; i < this.ship.bullets.length; i++) {
 			var currBullet = this.ship.bullets[i]
 			currBullet.update();
+
 			if ((currBullet.positionX < 0) || (currBullet.positionX > 800) ||
     		 (currBullet.positionY < 0) || (currBullet.positionY > 800)) {
 					 this.ship.bullets.splice(i, i);
@@ -147,7 +149,10 @@ var Asteroids = (function() {
 
 		this.ship.bulletHit(this.asteroids);
 
+		this.ship.speed /= 1.02;
+
 		var that = this;
+
 		if (this.ship.isHit(this.asteroids)) {
 			alert("Game Over!");
 			window.clearInterval(that.updateAndRender);
@@ -185,6 +190,7 @@ var Asteroids = (function() {
 	Ship.prototype.draw = function(ctx){
 
 		ctx.strokeStyle = "green";
+		ctx.lineWidth = 3;
 		ctx.fillStyle = "black";
 
 		if (this.positionX < 0) {
@@ -307,7 +313,6 @@ var Asteroids = (function() {
 
 				if (distance < (currBullet.radius + asteroids[i].radius)){
 					asteroids[i] = Asteroid.randomAsteroid(1, 1, 20);
-					this.bullets.splice(j, j)
 				}
 			}
 		}
