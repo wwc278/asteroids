@@ -114,18 +114,18 @@ var Asteroids = (function() {
 
 		var that = this;
 		key('up', function(){
-			that.ship.power(0, -0.5);
+			that.ship.power(-0.5);
 		})
 		key('down', function(){
-			that.ship.power(0, 0.5);
+			that.ship.power(0.5);
 		})
 
 		key('left', function(){
-			that.ship.power(-0.5, 0);
+			that.ship.turnLeft();
 		})
 
 		key('right', function(){
-			that.ship.power(0.5, 0);
+			that.ship.turnRight();
 		})
 
 		key('s', function(){
@@ -159,8 +159,15 @@ var Asteroids = (function() {
 
 	function Ship(x, y, r){
 		MovingObject.call(this, x, y, r);
-		this.dx = 1;
-		this.dy = 1;
+		this.direction = Math.PI/2;
+		this.speed = 0;
+		this.update = function(){
+			this.dx = Math.cos(this.direction) * this.speed;
+			this.dy = Math.sin(this.direction) * this.speed;
+			this.positionX += this.dx;
+			this.positionY += this.dy;
+			// console.log(this.dx, this.dy)
+		}
 		this.bullets = [];
 	}
 
@@ -170,6 +177,14 @@ var Asteroids = (function() {
 
 	F.prototype = MovingObject.prototype;
 	Ship.prototype = new F();
+
+	Ship.prototype.turnLeft = function(){
+		this.direction -= 0.001
+	}
+
+	Ship.prototype.turnRight = function(){
+		this.direction += 0.001
+	}
 
 	Ship.prototype.draw = function(ctx){
 
@@ -188,12 +203,31 @@ var Asteroids = (function() {
 			this.positionY %= 800;
 		};
 
+		var triangleSideLength, angle, secondPointX, secondPointY;
+		var thirdPointX, thirdPointX;
+
+		triangleSideLength = Math.sqrt(20 * 20 + 10 * 10);
+		angle = Math.atan(2);
+
+		secondPointX = this.positionX + triangleSideLength *
+		Math.cos(angle + Math.PI/2 - this.direction);
+		secondPointY = this.positionY - triangleSideLength *
+		Math.sin(angle + Math.PI/2 - this.direction);
+
+		thirdPointX = this.positionX +
+		Math.cos(Math.PI/2 - this.direction) * 20;
+		thirdPointY = this.positionY -
+		Math.sin(Math.PI/2 - this.direction) * 20;
+
+		console.log(secondPointX, secondPointY, thirdPointX, thirdPointY);
+
 		ctx.beginPath();
 		ctx.moveTo(this.positionX, this.positionY);
-		ctx.lineTo(this.positionX + 20, this.positionY);
-		ctx.lineTo(this.positionX + 10, this.positionY - 20);
+		ctx.lineTo(secondPointX, secondPointY);
+		ctx.lineTo(thirdPointX, thirdPointY);
 		ctx.lineTo(this.positionX, this.positionY);
 		ctx.stroke();
+
 
 		ctx.fill();
 	}
@@ -214,20 +248,13 @@ var Asteroids = (function() {
 		return false;
 	}
 
-	Ship.prototype.power = function(ax, ay){
-		this.dx += ax;
-		this.dy += ay;
-		if (this.dx > 3) {
-			this.dx = 3;
-		}
-		if (this.dy > 3) {
-			this.dy = 3;
-		}
-		if (this.dx < -3) {
-			this.dx = -3;
-		}
-		if (this.dy < -3) {
-			this.dy = -3;
+	Ship.prototype.power = function(accel){
+		this.speed += accel;
+
+		if (this.speed > 3) {
+			this.speed = 3;
+		} else if (this.speed < -3){
+			this.speed = -3;
 		}
 	}
 
@@ -269,9 +296,6 @@ var Asteroids = (function() {
 
 	Ship.prototype.bulletHit = function(asteroids, numAsteroids){
 
-		var survivedAsteroids = [];
-		var survivedBullets = [];
-
 		for(var i=0; i < asteroids.length; i++){
 			for(var j=0; j < this.bullets.length; j++){
 				var currBullet = this.bullets[j];
@@ -281,23 +305,17 @@ var Asteroids = (function() {
 				var distance = Math.sqrt(xDifference * xDifference +
 															   yDifference * yDifference);
 
-				if (!(distance < (currBullet.radius + asteroids[i].radius))){
-					survivedAsteroids.push(asteroids[i]);
-					survivedBullets.push(currBullet);
+				if (distance < (currBullet.radius + asteroids[i].radius)){
+					asteroids.splice(i, i)
 				}
 			}
 		}
 
-		console.log(survivedAsteroids.length)
-
-		if (survivedAsteroids.length < numAsteroids) {
-			for (var i = survivedAsteroids.length; i < numAsteroids; i++){
-			  survivedAsteroids.push(Asteroid.randomAsteroid(1, 1, 20));
+		if (asteroids.length < numAsteroids) {
+			for (var i = asteroids.length; i < numAsteroids; i++){
+			  asteroids.push(Asteroid.randomAsteroid(1, 1, 20));
 			}
 		}
-
-		this.bullets = survivedBullets;
-		asteroids = survivedAsteroids;
 	}
 
 	return {
