@@ -311,7 +311,7 @@ var Asteroids = (function() {
 				var distance = Math.sqrt(xDifference * xDifference +
 															   yDifference * yDifference);
 
-				if (distance < (currBullet.radius + asteroids[i].radius)){
+				if (distance < (currBullet.radius + asteroids[i].radius)){ 
 					asteroids[i] = Asteroid.randomAsteroid(1, 1, 20);
 				}
 			}
