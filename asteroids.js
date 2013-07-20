@@ -169,6 +169,7 @@ var Asteroids = (function(my) {
 	
 
 	function Bullet(x, y, r, d){
+		console.log('making new bullet')
 		MovingObject.call(this, x, y, r);
 		this.direction = d;
 		this.speed = 6;

@@ -1,9 +1,9 @@
 // file for keypress or key hold events
 
-$(document).keydown(function(e){
+$(document).keypress(function(e){
 	console.log(e.which)
-	if (e.which === 83){
-		Asteroids.game.ship.fireBullet();
+	if (e.which === 115){
+		Asteroids.game.ship.toggleFireBullet();
 	}
 
 })

@@ -13,6 +13,7 @@
 			this.positionY += this.dy;
 		}
 		this.bullets = [];
+		this.firingBullet = false;
 	}
 
 	function F(){
@@ -101,30 +102,40 @@
 		}
 	}
 
-	Ship.prototype.fireBullet = function(){
+	Ship.prototype.toggleFireBullet = function(){
 		var posX = this.positionX;
 		var posY = this.positionY;
-		this.bullets.push(new my.Bullet(posX, posY, 2, this.direction + 3.3));
-	}
+    var that = this;
 
-	Ship.prototype.bulletHit = function(asteroids){
+    if (this.firingBullet){
+      window.clearInterval(this.firingBullet);
+      this.firingBullet = false;
+    } else {
+      this.firingBullet = window.setInterval(function(){
+        that.bullets.push(new my.Bullet(posX, posY, 2, that.direction + 3.3));	
+      }, 1000/60)
+    }
 
-		for(var i=0; i < asteroids.length; i++){
-			for(var j=0; j < this.bullets.length; j++){
-				var currBullet = this.bullets[j];
+  }
 
-				var xDifference = (asteroids[i].positionX - currBullet.positionX);
-				var yDifference = (asteroids[i].positionY - currBullet.positionY);
-				var distance = Math.sqrt(xDifference * xDifference +
-					yDifference * yDifference);
+  Ship.prototype.bulletHit = function(asteroids){
 
-				if (distance < (currBullet.radius + asteroids[i].radius)){ 
-					asteroids[i] = my.Asteroid.randomAsteroid(1, 1, 20);
-				}
-			}
-		}
-	}
+    for(var i=0; i < asteroids.length; i++){
+     for(var j=0; j < this.bullets.length; j++){
+      var currBullet = this.bullets[j];
 
-	my.Ship = Ship;
+      var xDifference = (asteroids[i].positionX - currBullet.positionX);
+      var yDifference = (asteroids[i].positionY - currBullet.positionY);
+      var distance = Math.sqrt(xDifference * xDifference +
+       yDifference * yDifference);
+
+      if (distance < (currBullet.radius + asteroids[i].radius)){ 
+       asteroids[i] = my.Asteroid.randomAsteroid(1, 1, 20);
+     }
+   }
+ }
+}
+
+my.Ship = Ship;
 
 })(Asteroids);
