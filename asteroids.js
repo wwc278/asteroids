@@ -75,6 +75,7 @@ var Asteroids = (function(my) {
 		this.xDim = xDim;
 		this.yDim = yDim;
 		this.numAsteroids = numAsteroids;
+		console.log('make new ship')
 		this.ship = new my.Ship(xDim/2, yDim/2, 8);
 		this.asteroids = [];
 
@@ -160,7 +161,8 @@ var Asteroids = (function(my) {
 			// alert("Game Over!");
 			window.clearInterval(that.updateAndRender);
 
-			new my.Game(800, 800, 6).start(my.canvasEl);
+			Asteroids.game = new my.Game(800, 800, 6);
+			Asteroids.game.start(my.canvasEl);
 		}
 	}
 

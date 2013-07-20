@@ -4,6 +4,6 @@ $(function () {
 
 	$('body').append(canvas);
 
-	Asteroids.game = new Asteroids.Game(800, 800, 6)
+	Asteroids.game = new Asteroids.Game(800, 800, 6);
 	Asteroids.game.start(canvas.get(0));
 });
