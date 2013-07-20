@@ -3,6 +3,7 @@ $(function () {
 		"' height='" + 800 + "'></canvas>");
 
 	$('body').append(canvas);
-	console.log('calling new Asteroids')
-	new Asteroids.Game(800, 800, 6).start(canvas.get(0));
+
+	Asteroids.game = new Asteroids.Game(800, 800, 6)
+	Asteroids.game.start(canvas.get(0));
 });

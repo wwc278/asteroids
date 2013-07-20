@@ -81,6 +81,8 @@ var Asteroids = (function(my) {
 		for (var i = 0; i < numAsteroids; i++) {
 			this.asteroids.push(Asteroid.randomAsteroid(this.xDim, this.yDim, 20));
 		}
+
+		return this;
 	}
 
 	Game.prototype.render = function(ctx){
@@ -99,6 +101,7 @@ var Asteroids = (function(my) {
 	}
 
 	Game.prototype.start = function(canvasEl){
+		my.canvasEl = canvasEl;
 		var ctx = canvasEl.getContext("2d");
 		var that = this;
 
@@ -127,9 +130,9 @@ var Asteroids = (function(my) {
 			that.ship.turnRight();
 		})
 
-		key('s', function(){
-			that.ship.fireBullet();
-		})
+		// key('s', function(){
+		// 	that.ship.fireBullet();
+		// })
 
 		this.ship.update();
 
@@ -154,8 +157,10 @@ var Asteroids = (function(my) {
 		var that = this;
 
 		if (this.ship.isHit(this.asteroids)) {
-			alert("Game Over!");
+			// alert("Game Over!");
 			window.clearInterval(that.updateAndRender);
+
+			new my.Game(800, 800, 6).start(my.canvasEl);
 		}
 	}
 
